@@ -7,20 +7,9 @@ import numpy as np
 import sys
 import time
 import json
-
+import os
 
 db_path = 'landMarks.db'
-
-def initialize_detector():
-    model_path = "face_detection_yunet_2023mar.onnx"
-    detector = cv2.FaceDetectorYN.create(model_path, "", (640, 640))
-    return detector
-
-def detect_faces(detector, image):
-    # Yüz tespiti
-    _, faces = detector.detect(image)
-    return faces
-
 def encode_faces(image):
     encodings = face_recognition.face_encodings(image)
     if encodings:
@@ -116,24 +105,7 @@ class LoginPage(QDialog):
 
             HER BİR YÜZ LOCASYONU İÇİN ENCODING VE LANDMARKS DEGERLERİ FOR ICERİSİNE ALINARAK VERİ TABANINA GÖNDERİLDİ
             YORUM SATIRI İLE YUKARI KOD PARÇASI FARKLARI GÖRÜNMEKTEDİR.
-            
             '''
-            # if face_locations:
-            #     encoding = face_recognition.face_encodings(frame)[0]
-            #     print(landmarks)
-            #     name = self.get_face_data_from_db(encoding,landmarks)
-            #     print(f"NAME TYPE : {type(name)}")
-            #     if name:
-            #         for face_location in face_locations:
-            #             top, right, bottom, left = face_location
-            #             cv2.putText(frame, name, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 200), 2)
-            #             cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
-            #     else:
-            #         pass
-            # else:
-            #     print("Yuz bulunamadi")
-            # cv2.putText(frame, fps, (7, 70), font, 3, (100, 255, 0), 3, cv2.LINE_AA)
-            # cv2.imshow("Giris Yap", frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -298,70 +270,14 @@ class Register(QDialog):
                         if encoding is not None and landmarks:
                             QMessageBox.information(self,"Bilgi","Fotograf Encodlandi ve veri tabanına kaydedildi")
                             save_encoding_and_landmarks_to_db(username,encoding,landmarks[0])
+                            os.remove(path)
                             break
                         else:
                             QMessageBox.warning(self,"Error","Fotograf Encodlanamadi")
-                    # image = cv2.imread(path)
-                        # encoding = encode_faces(image)
-                        # if encoding is not None:
-                        #     print("Encoding başarılı")
-                        #     print("Veri tabanına kaydedildi")
-                        #     save_encoding_to_db(username, encoding)
-                        # else:
-                        #     print("Fotograf Encodlanamadı")
             cv2.destroyWindow('Kamera')
             print(f"{angle} açıdan fotoğraf çekildi.")
-
-            # image = cv2.imread(path)
-            # encoding = encode_faces(image)
-            # if encoding is not None:
-            #     print("Encoding başarılı")
-            #     print("Veri tabanına kaydedildi")
-            #     save_encoding_to_db(username, encoding)
-            # else:
-            #     print("Fotograf Encodlanamadı")
-
         camera.release()
         cv2.destroyAllWindows()
-
-        # Fotoğrafları işleyip veritabanına kaydet
-        # for path in photo_paths:
-        #     print(f"Processing {path}...")
-        #     image = cv2.imread(path)
-        #     print(f"İmage Size : {image.size}")
-        #     encoding = encode_faces(image)
-        #     if encoding is not None:
-        #         print("Encoding başarılı")
-        #         print("Veri tabanına kaydedildi")
-        #         save_encoding_to_db(username, encoding)
-        #     else:
-        #         print("Fotograf Encodlanamadı")
-
-
-            # if image is not None:
-            #     faces = detect_faces(detector, image)
-            #     if faces is not None:
-            #         print(f"Faces detected: {faces}")
-            #         for face in faces:
-            #             x1, y1, x2, y2 = map(int, face[:4])
-            #             face_image = image[y1:y2, x1:x2]
-            #             print(f"Face Image Size : {face_image.size}")
-            #             if face_image.size > 0 : 
-            #                 face_image_rgb = cv2.cvtColor(face_image, cv2.COLOR_BGR2RGB)
-            #                 encoding = encode_faces(face_image_rgb)
-            #                 print(f"Encoding {encoding}")
-            #                 if encoding is not None:
-            #                     print("Encoding obtained.")
-            #                     print("Saving to database...")
-            #                     save_encoding_to_db(username, encoding)
-            #                 else:
-            #                     print("No encoding found.")
-            #             else:
-            #                 print("FACE IMAGE EMPTY")
-            #     else:
-            #         print("No faces detected.")
-            # else:
-            #     print(f"Failed to load image from {path}")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
